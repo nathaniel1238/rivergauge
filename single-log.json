@@ -1,0 +1,53 @@
+{
+    "phy_payload": {
+        "mhdr": {
+            "f_type": "UnconfirmedDataUp",
+            "major": "LoRaWANR1"
+        },
+        "mic": [
+            149,
+            131,
+            142,
+            200
+        ],
+        "payload": {
+            "f_port": 1,
+            "fhdr": {
+                "devaddr": "0053a8e0",
+                "f_cnt": 1,
+                "f_ctrl": {
+                    "ack": false,
+                    "adr": false,
+                    "adr_ack_req": false,
+                    "class_b": false,
+                    "f_opts_len": 0,
+                    "f_pending": false
+                },
+                "f_opts": []
+            },
+            "frm_payload": "68656c6c6f00"
+        }
+    },
+    "rx_info": [
+        {
+            "context": "DSAqIg==",
+            "crcStatus": "CRC_OK",
+            "gatewayId": "28372ffffe805561",
+            "location": {},
+            "nsTime": "2026-04-02T22:44:13.047912486+00:00",
+            "rssi": -39,
+            "snr": 13,
+            "uplinkId": 61739
+        }
+    ],
+    "tx_info": {
+        "frequency": 902300000,
+        "modulation": {
+            "lora": {
+                "bandwidth": 125000,
+                "codeRate": "CR_4_5",
+                "spreadingFactor": 7
+            }
+        }
+    }
+}

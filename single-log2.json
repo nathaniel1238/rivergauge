@@ -1,0 +1,46 @@
+{
+    "deduplicationId": "a0c154f0-523d-4a1b-8b3a-f677afa9af09",
+    "time": "2026-04-02T22:44:13.315450108+00:00",
+    "deviceInfo": {
+        "tenantId": "1664fc77-5512-41ff-a4e6-fc02f7a5cf4e",
+        "tenantName": "ChirpStack",
+        "applicationId": "d47f461e-e1e5-420c-94e2-d743aebd40ac",
+        "applicationName": "MyApp",
+        "deviceProfileId": "9c6dc363-0458-4d20-a0a9-29b54ad83343",
+        "deviceProfileName": "Test",
+        "deviceName": "test",
+        "devEui": "28372ffffe805561",
+        "deviceClassEnabled": "CLASS_A",
+        "tags": {}
+    },
+    "devAddr": "0053a8e0",
+    "adr": false,
+    "dr": 3,
+    "fCnt": 1,
+    "fPort": 1,
+    "confirmed": false,
+    "data": "aGVsbG8A",
+    "rxInfo": [
+        {
+            "gatewayId": "28372ffffe805561",
+            "uplinkId": 61739,
+            "nsTime": "2026-04-02T22:44:13.047912486+00:00",
+            "rssi": -39,
+            "snr": 13,
+            "location": {},
+            "context": "DSAqIg==",
+            "crcStatus": "CRC_OK"
+        }
+    ],
+    "txInfo": {
+        "frequency": 902300000,
+        "modulation": {
+            "lora": {
+                "bandwidth": 125000,
+                "spreadingFactor": 7,
+                "codeRate": "CR_4_5"
+            }
+        }
+    },
+    "regionConfigId": "us915_0"
+}
