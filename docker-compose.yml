@@ -33,6 +33,7 @@ services:
       - "3000:3000"
     environment:
       BACKEND_URL: http://backend:8000
+      NEXT_PUBLIC_FEATURE_ALERTS: "false"
     depends_on:
       - backend
     volumes:
