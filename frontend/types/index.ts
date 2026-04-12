@@ -32,3 +32,36 @@ export const RANGE_OPTIONS: RangeOption[] = [
   { value: "30d", label: "Last 30 days",  xLabel: "Time - Last 30 days",  dropdownLabel: "Last 30 days"   },
   { value: "3m",  label: "Last 3 months", xLabel: "Time - Last 3 months", dropdownLabel: "Last 3 months"  },
 ];
+
+// ── Alert subscriptions ────────────────────────────────────────────────────
+export type AlertCondition = "above" | "below";
+export type AlertChannel   = "email" | "sms";
+
+export interface AlertSubscribePayload {
+  gauge_id:     number;
+  condition:    AlertCondition;
+  threshold_in: number;
+  channel:      AlertChannel;
+  contact:      string;
+}
+
+export interface AlertSubscribeResponse {
+  id:           number;
+  token:        string;
+  gauge_id:     number;
+  condition:    AlertCondition;
+  threshold_in: number;
+  channel:      AlertChannel;
+  contact:      string; // masked
+}
+
+export interface LocalAlertRule {
+  token:           string;
+  gauge_id:        number;
+  gauge_name:      string;
+  condition:       AlertCondition;
+  threshold_in:    number;
+  channel:         AlertChannel;
+  contact_masked:  string;
+  active:          boolean; // local-only toggle
+}

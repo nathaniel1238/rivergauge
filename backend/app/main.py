@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import Base, engine
-from app.routers import dashboard, gauges, ingest
+from app.routers import alerts, dashboard, gauges, ingest
 
 
 @asynccontextmanager
@@ -24,6 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(alerts.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
 app.include_router(gauges.router, prefix="/api")
 app.include_router(ingest.router, prefix="/api")

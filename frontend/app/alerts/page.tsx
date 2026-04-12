@@ -1,22 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import AlertModal from "@/components/AlertModal";
+import { unsubscribeAlert } from "@/lib/api";
+import type {
+  AlertCondition,
+  AlertSubscribeResponse,
+  LocalAlertRule,
+} from "@/types";
 
-interface AlertRule {
-  id: number;
-  gauge: string;
-  condition: string;
-  threshold: string;
-  channel: string;
-  active: boolean;
-}
+const LS_KEY = "river_gauge_subscriptions";
 
-const SAMPLE_RULES: AlertRule[] = [
-  { id: 1, gauge: "Sandy River – Site 1", condition: "above", threshold: "12.00 in", channel: "Email", active: true },
-  { id: 2, gauge: "Androscoggin River", condition: "below", threshold: "2.50 in", channel: "SMS",   active: false },
-];
-
-function ConditionBadge({ condition }: { condition: string }) {
+function ConditionBadge({ condition }: { condition: AlertCondition }) {
   const up = condition === "above";
   return (
     <span
@@ -38,13 +33,69 @@ function ConditionBadge({ condition }: { condition: string }) {
   );
 }
 
-export default function AlertsPage() {
-  const [rules, setRules] = useState<AlertRule[]>(SAMPLE_RULES);
+function loadFromStorage(): LocalAlertRule[] {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    return raw ? (JSON.parse(raw) as LocalAlertRule[]) : [];
+  } catch {
+    return [];
+  }
+}
 
-  const toggle = (id: number) =>
-    setRules((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, active: !r.active } : r))
+function saveToStorage(rules: LocalAlertRule[]) {
+  localStorage.setItem(LS_KEY, JSON.stringify(rules));
+}
+
+export default function AlertsPage() {
+  const [rules, setRules] = useState<LocalAlertRule[]>([]);
+  const [showModal, setShowModal] = useState(false);
+  const [successBanner, setSuccessBanner] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
+
+  // Hydrate from localStorage on mount (avoids SSR mismatch)
+  useEffect(() => {
+    setRules(loadFromStorage());
+    setHydrated(true);
+  }, []);
+
+  const handleSuccess = (res: AlertSubscribeResponse, gaugeName: string) => {
+    const newRule: LocalAlertRule = {
+      token:          res.token,
+      gauge_id:       res.gauge_id,
+      gauge_name:     gaugeName,
+      condition:      res.condition,
+      threshold_in:   res.threshold_in,
+      channel:        res.channel,
+      contact_masked: res.contact,
+      active:         true,
+    };
+    const updated = [newRule, ...rules];
+    setRules(updated);
+    saveToStorage(updated);
+    setShowModal(false);
+    setSuccessBanner(
+      `Subscribed! You'll be notified at ${res.contact} when ${gaugeName} is ${res.condition} ${res.threshold_in.toFixed(2)} in.`
     );
+  };
+
+  const handleToggle = (token: string) => {
+    const updated = rules.map((r) =>
+      r.token === token ? { ...r, active: !r.active } : r
+    );
+    setRules(updated);
+    saveToStorage(updated);
+  };
+
+  const handleDelete = async (token: string) => {
+    try {
+      await unsubscribeAlert(token);
+    } catch {
+      // If the backend fails, still remove locally
+    }
+    const updated = rules.filter((r) => r.token !== token);
+    setRules(updated);
+    saveToStorage(updated);
+  };
 
   return (
     <div className="max-w-3xl page-enter">
@@ -61,7 +112,7 @@ export default function AlertsPage() {
 
         <button
           className="flex items-center gap-1.5 text-[12.5px] font-medium text-white bg-[#3b6cf5] hover:bg-[#2b5ce0] px-3.5 py-2 rounded-xl transition-colors shadow-sm"
-          onClick={() => {}}
+          onClick={() => setShowModal(true)}
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -70,19 +121,38 @@ export default function AlertsPage() {
         </button>
       </div>
 
+      {/* Success banner */}
+      {successBanner && (
+        <div className="mb-5 flex items-start gap-3 px-4 py-3.5 rounded-xl bg-green-50 border border-green-100 animate-fade-in">
+          <svg className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <p className="text-[11.5px] text-green-700 leading-relaxed flex-1">{successBanner}</p>
+          <button
+            onClick={() => setSuccessBanner(null)}
+            className="text-green-400 hover:text-green-600 transition-colors"
+            aria-label="Dismiss"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
+
       {/* Rules list */}
-      {rules.length > 0 ? (
+      {!hydrated ? null : rules.length > 0 ? (
         <div className="space-y-3">
           {rules.map((rule, i) => (
             <div
-              key={rule.id}
+              key={rule.token}
               className="bg-white rounded-2xl border border-gray-100 shadow-card px-5 py-4 flex items-center gap-4 animate-fade-in-up"
               style={{ animationDelay: `${i * 55}ms` }}
             >
               {/* Toggle */}
               <button
-                onClick={() => toggle(rule.id)}
-                className={`relative w-8 h-4.5 rounded-full transition-colors flex-shrink-0 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 ${
+                onClick={() => handleToggle(rule.token)}
+                className={`relative flex-shrink-0 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 ${
                   rule.active ? "bg-[#3b6cf5]" : "bg-gray-200"
                 }`}
                 style={{ height: "18px", width: "32px" }}
@@ -98,15 +168,17 @@ export default function AlertsPage() {
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <p className="text-[13px] font-medium text-gray-900 leading-snug truncate">
-                  {rule.gauge}
+                  {rule.gauge_name}
                 </p>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <ConditionBadge condition={rule.condition} />
                   <span className="text-[11.5px] font-semibold text-gray-700 tabular">
-                    {rule.threshold}
+                    {rule.threshold_in.toFixed(2)} in
                   </span>
                   <span className="text-gray-300 text-[10px]">·</span>
-                  <span className="text-[11px] text-gray-400">{rule.channel}</span>
+                  <span className="text-[11px] text-gray-400 capitalize">{rule.channel}</span>
+                  <span className="text-gray-300 text-[10px]">·</span>
+                  <span className="text-[11px] text-gray-400">{rule.contact_masked}</span>
                 </div>
               </div>
 
@@ -120,7 +192,7 @@ export default function AlertsPage() {
 
               {/* Delete */}
               <button
-                onClick={() => setRules((prev) => prev.filter((r) => r.id !== rule.id))}
+                onClick={() => handleDelete(rule.token)}
                 className="p-1.5 -mr-1 text-gray-300 hover:text-red-400 hover:bg-red-50 rounded-lg transition-all"
                 aria-label="Delete rule"
               >
@@ -145,23 +217,18 @@ export default function AlertsPage() {
           </p>
           <button
             className="text-xs font-medium text-gray-500 hover:text-gray-800 underline underline-offset-2 transition-colors"
-            onClick={() => {}}
+            onClick={() => setShowModal(true)}
           >
             Create your first rule
           </button>
         </div>
       )}
 
-      {/* Info banner */}
-      <div className="mt-6 flex items-start gap-3 px-4 py-3.5 rounded-xl bg-blue-50 border border-blue-100 animate-fade-in" style={{ animationDelay: "200ms" }}>
-        <svg className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <p className="text-[11.5px] text-blue-700 leading-relaxed">
-          Alert delivery (email, SMS, webhook) requires backend notification configuration.
-          Rules shown here are stored locally for preview purposes.
-        </p>
-      </div>
+      <AlertModal
+        open={showModal}
+        onClose={() => setShowModal(false)}
+        onSuccess={handleSuccess}
+      />
     </div>
   );
 }

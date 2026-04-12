@@ -56,7 +56,9 @@ export default function Sidebar() {
 
       {/* ── Nav ──────────────────────────────────────────────────────── */}
       <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
-        {navItems.map((item) => {
+        {navItems.filter((item) =>
+          item.href !== "/alerts" || process.env.NEXT_PUBLIC_FEATURE_ALERTS === "true"
+        ).map((item) => {
           const active =
             pathname === item.href ||
             (item.href !== "/" && pathname.startsWith(item.href));
