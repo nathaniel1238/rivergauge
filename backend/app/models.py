@@ -10,7 +10,8 @@ class Gauge(Base):
     __tablename__ = "gauges"
 
     id = Column(Integer, primary_key=True, index=True)
-    device_id = Column(Integer, unique=True, nullable=False)
+    dev_eui   = Column(String(16), unique=True, nullable=True, index=True)
+    device_id = Column(Integer, unique=True, nullable=True)
     name = Column(String(255), nullable=False, default="Unknown Device")
     town_state = Column(String(255))
     last_updated_at = Column(DateTime(timezone=True))

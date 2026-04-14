@@ -31,15 +31,27 @@ async def ingest_chirpstack(body: dict, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=422, detail=str(exc))
 
     device_id: int = decoded["device_id"]
+    dev_eui: str | None = body.get("deviceInfo", {}).get("devEui") or None
 
     # ── Resolve / auto-create gauge ─────────────────────────────────────────
-    result = await db.execute(select(Gauge).where(Gauge.device_id == device_id))
-    gauge = result.scalar_one_or_none()
+    # 1. Primary lookup by devEui (stable IEEE hardware address from ChirpStack)
+    gauge = None
+    if dev_eui:
+        result = await db.execute(select(Gauge).where(Gauge.dev_eui == dev_eui))
+        gauge = result.scalar_one_or_none()
 
+    # 2. Fallback: look up by payload device_id (handles seed data / test packets)
+    if gauge is None:
+        result = await db.execute(select(Gauge).where(Gauge.device_id == device_id))
+        gauge = result.scalar_one_or_none()
+        if gauge is not None and dev_eui and gauge.dev_eui is None:
+            gauge.dev_eui = dev_eui  # backfill devEui on existing gauge
+
+    # 3. Create new gauge if not found by either identifier
     if gauge is None:
         device_info = body.get("deviceInfo", {})
         name = device_info.get("deviceName") or f"Device {device_id}"
-        gauge = Gauge(device_id=device_id, name=name)
+        gauge = Gauge(device_id=device_id, name=name, dev_eui=dev_eui)
         db.add(gauge)
         await db.flush()  # populate gauge.id
 
