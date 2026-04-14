@@ -26,6 +26,7 @@ const config: Config = {
         "fade-in-up":   "fadeInUp 0.38s cubic-bezier(0.16,1,0.3,1) both",
         "fade-in":      "fadeIn 0.25s ease-out both",
         "slide-down":   "slideDown 0.18s cubic-bezier(0.16,1,0.3,1) both",
+        "slide-up":     "slideUp 0.32s cubic-bezier(0.16,1,0.3,1) both",
         "shimmer":      "shimmer 1.6s linear infinite",
         "ping-slow":    "ping 2.2s cubic-bezier(0,0,0.2,1) infinite",
       },
@@ -41,6 +42,10 @@ const config: Config = {
         slideDown: {
           "0%":   { opacity: "0", transform: "translateY(-6px) scaleY(0.96)" },
           "100%": { opacity: "1", transform: "translateY(0) scaleY(1)" },
+        },
+        slideUp: {
+          "0%":   { opacity: "0", transform: "translateY(100%)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
         },
         shimmer: {
           "0%":   { backgroundPosition: "-400px 0" },
