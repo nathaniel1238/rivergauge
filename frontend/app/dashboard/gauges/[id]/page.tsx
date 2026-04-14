@@ -152,7 +152,7 @@ export default function GaugeDetailPage({ params }: { params: { id: string } }) 
       </div>
 
       {/* ── Stats ────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <StatCard
           label="Current"
           value={fmt(current)}
@@ -209,18 +209,18 @@ export default function GaugeDetailPage({ params }: { params: { id: string } }) 
         </div>
 
         {readingsLoading && !readings ? (
-          <div className="h-[420px] rounded-xl skeleton flex items-center justify-center">
+          <div className="h-[260px] sm:h-[420px] rounded-xl skeleton flex items-center justify-center">
             <span className="text-[11px] text-gray-400">Loading…</span>
           </div>
         ) : !readings?.length ? (
-          <div className="h-[420px] rounded-xl bg-gray-50 flex flex-col items-center justify-center gap-2">
+          <div className="h-[260px] sm:h-[420px] rounded-xl bg-gray-50 flex flex-col items-center justify-center gap-2">
             <svg className="w-8 h-8 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
             <p className="text-[12px] text-gray-400">No readings in {rangeOption.dropdownLabel.toLowerCase()}</p>
           </div>
         ) : (
-          <DetailChart data={readings} range={range} units={units} timezone={timezone} height={420} />
+          <DetailChart data={readings} range={range} units={units} timezone={timezone} height="clamp(260px, 45vh, 420px)" />
         )}
       </div>
     </div>

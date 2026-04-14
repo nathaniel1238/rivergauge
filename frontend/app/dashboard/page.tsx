@@ -65,7 +65,7 @@ function Pagination({
       <button
         onClick={() => onChange(current - 1)}
         disabled={current === 0}
-        className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-white hover:text-gray-700 hover:shadow-card disabled:opacity-25 disabled:cursor-not-allowed transition-all duration-150"
+        className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-400 hover:bg-white hover:text-gray-700 hover:shadow-card disabled:opacity-25 disabled:cursor-not-allowed transition-all duration-150"
         aria-label="Previous page"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -75,14 +75,14 @@ function Pagination({
 
       {shown.map((i, idx) =>
         i < 0 ? (
-          <span key={`ellipsis-${idx}`} className="w-8 h-8 flex items-center justify-center text-gray-300 text-sm select-none">
+          <span key={`ellipsis-${idx}`} className="w-10 h-10 flex items-center justify-center text-gray-300 text-sm select-none">
             …
           </span>
         ) : (
           <button
             key={i}
             onClick={() => onChange(i)}
-            className={`w-8 h-8 flex items-center justify-center rounded-lg text-[13px] font-medium transition-all duration-150 ${
+            className={`w-10 h-10 flex items-center justify-center rounded-lg text-[13px] font-medium transition-all duration-150 ${
               i === current
                 ? "bg-[#3b6cf5] text-white shadow-sm"
                 : "text-gray-500 hover:bg-white hover:text-gray-800 hover:shadow-card"
@@ -99,7 +99,7 @@ function Pagination({
       <button
         onClick={() => onChange(current + 1)}
         disabled={current === total - 1}
-        className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-white hover:text-gray-700 hover:shadow-card disabled:opacity-25 disabled:cursor-not-allowed transition-all duration-150"
+        className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-400 hover:bg-white hover:text-gray-700 hover:shadow-card disabled:opacity-25 disabled:cursor-not-allowed transition-all duration-150"
         aria-label="Next page"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -149,7 +149,7 @@ export default function DashboardPage() {
   return (
     <div className="max-w-6xl">
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between gap-4 mb-7 flex-wrap">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-7">
         <div>
           <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight leading-tight">
             Gauges
@@ -164,7 +164,7 @@ export default function DashboardPage() {
 
         <div className="flex items-center gap-2.5 flex-wrap">
           {/* Search */}
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <svg
               className="absolute left-3 top-1/2 -translate-y-1/2 w-[13px] h-[13px] text-gray-400 pointer-events-none"
               fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}
@@ -177,7 +177,7 @@ export default function DashboardPage() {
               placeholder="Search gauges…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-8 pr-8 py-[7px] bg-white border border-gray-200 rounded-full text-[13px] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#3b6cf5] focus:ring-2 focus:ring-[#3b6cf5]/10 shadow-card transition-all w-44 md:w-52"
+              className="pl-8 pr-8 py-[7px] bg-white border border-gray-200 rounded-full text-[13px] text-gray-800 placeholder-gray-400 focus:outline-none focus:border-[#3b6cf5] focus:ring-2 focus:ring-[#3b6cf5]/10 shadow-card transition-all w-full sm:w-44 md:w-52"
             />
             {search && (
               <button
