@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { TimeRange } from "@/types";
+import type { Units, Timezone } from "@/lib/settings";
 
 export interface DataPoint {
   ts: string;
@@ -16,28 +17,26 @@ export interface PinnedPoint {
 interface Props {
   data: DataPoint[];
   range: TimeRange;
+  units?: Units;
+  timezone?: Timezone;
   height?: number;
 }
 
-function fmtAxisLabel(ts: number, range: TimeRange): string {
+function fmtAxisLabel(ts: number, range: TimeRange, timezone: Timezone): string {
   const d = new Date(ts);
   if (range === "24h") {
     return d.toLocaleString("en-US", {
-      hour: "numeric", minute: "2-digit", hour12: true,
-      timeZone: "America/New_York",
+      hour: "numeric", minute: "2-digit", hour12: true, timeZone: timezone,
     });
   }
-  return d.toLocaleString("en-US", {
-    month: "short", day: "numeric",
-    timeZone: "America/New_York",
-  });
+  return d.toLocaleString("en-US", { month: "short", day: "numeric", timeZone: timezone });
 }
 
-export function fmtTooltipTime(epochMs: number): string {
+export function fmtTooltipTime(epochMs: number, timezone: Timezone = "America/New_York"): string {
   return new Date(epochMs).toLocaleString("en-US", {
     month: "short", day: "numeric", year: "numeric",
     hour: "numeric", minute: "2-digit", second: "2-digit",
-    hour12: true, timeZone: "America/New_York", timeZoneName: "short",
+    hour12: true, timeZone: timezone, timeZoneName: "short",
   });
 }
 
@@ -46,7 +45,15 @@ function nearest(pts: [number, number][], ts: number): [number, number] | null {
   return pts.reduce((p, c) => Math.abs(c[0] - ts) < Math.abs(p[0] - ts) ? c : p);
 }
 
-export default function DetailChart({ data, range, height = 420 }: Props) {
+export default function DetailChart({
+  data,
+  range,
+  units    = "imperial",
+  timezone = "America/New_York",
+  height   = 420,
+}: Props) {
+  const isMetric  = units === "metric";
+  const unitLabel = isMetric ? "cm" : "in";
   const containerRef = useRef<HTMLDivElement>(null);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chartRef       = useRef<any>(null);
@@ -67,7 +74,7 @@ export default function DetailChart({ data, range, height = 420 }: Props) {
           fontSize: 11,
           hideOverlap: true,
           margin: 10,
-          formatter: (v: number) => fmtAxisLabel(v, range),
+          formatter: (v: number) => fmtAxisLabel(v, range, timezone),
         },
         splitLine: { show: false },
       },
@@ -76,7 +83,7 @@ export default function DetailChart({ data, range, height = 420 }: Props) {
         axisLabel: {
           color: "#9ca3af",
           fontSize: 11,
-          formatter: (v: number) => `${v.toFixed(1)}″`,
+          formatter: (v: number) => `${v.toFixed(1)} ${unitLabel}`,
           margin: 8,
         },
         splitLine: { show: true, lineStyle: { color: "#e2e8f0", width: 1 } },
@@ -99,9 +106,9 @@ export default function DetailChart({ data, range, height = 420 }: Props) {
           if (!params?.length) return "";
           const [ts, val] = params[0].value;
           return `
-            <div style="font-size:10.5px;color:#9ca3af;margin-bottom:4px;letter-spacing:0.01em">${fmtTooltipTime(ts)}</div>
+            <div style="font-size:10.5px;color:#9ca3af;margin-bottom:4px;letter-spacing:0.01em">${fmtTooltipTime(ts, timezone)}</div>
             <div style="font-size:17px;font-weight:650;color:#111827;letter-spacing:-0.5px;line-height:1.1">
-              ${val.toFixed(2)}<span style="font-size:12px;font-weight:500;color:#6b7280;margin-left:2px">in</span>
+              ${val.toFixed(2)}<span style="font-size:12px;font-weight:500;color:#6b7280;margin-left:2px">${unitLabel}</span>
             </div>
           `;
         },
@@ -153,7 +160,7 @@ export default function DetailChart({ data, range, height = 420 }: Props) {
       if (cancelled || !containerRef.current) return;
       chartRef.current = echarts.init(containerRef.current, undefined, { renderer: "canvas" });
 
-      const sd: [number, number][] = data.map((d) => [new Date(d.ts).getTime(), d.water_level_in]);
+      const sd: [number, number][] = data.map((d) => [new Date(d.ts).getTime(), isMetric ? d.water_level_in * 2.54 : d.water_level_in]);
       seriesDataRef.current = sd;
       chartRef.current.setOption(buildOption(sd, null));
 
@@ -183,7 +190,7 @@ export default function DetailChart({ data, range, height = 420 }: Props) {
   // Update on data/range change
   useEffect(() => {
     if (!chartRef.current) return;
-    const sd: [number, number][] = data.map((d) => [new Date(d.ts).getTime(), d.water_level_in]);
+    const sd: [number, number][] = data.map((d) => [new Date(d.ts).getTime(), isMetric ? d.water_level_in * 2.54 : d.water_level_in]);
     seriesDataRef.current = sd;
     setPinned(null);
     chartRef.current.setOption(buildOption(sd, null), true);
@@ -211,7 +218,7 @@ export default function DetailChart({ data, range, height = 420 }: Props) {
             <span className="text-[11px] text-blue-300 mx-0.5">—</span>
             <span className="text-sm font-semibold text-blue-900 tabular">
               {pinned.value.toFixed(2)}
-              <span className="text-blue-500 font-normal ml-0.5 text-xs"> in</span>
+              <span className="text-blue-500 font-normal ml-0.5 text-xs"> {unitLabel}</span>
             </span>
           </>
         )}
@@ -238,7 +245,7 @@ export default function DetailChart({ data, range, height = 420 }: Props) {
             translate: "0 -50%",
           }}
         >
-          Water Level (in)
+          Water Level ({unitLabel})
         </div>
         <div ref={containerRef} style={{ height, width: "100%" }} />
       </div>

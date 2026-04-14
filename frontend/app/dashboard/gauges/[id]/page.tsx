@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import useSWR from "swr";
 import dynamic from "next/dynamic";
@@ -10,6 +10,7 @@ import TimeRangeDropdown from "@/components/TimeRangeDropdown";
 import { timeAgo } from "@/lib/api";
 import { RANGE_OPTIONS, type TimeRange } from "@/types";
 import type { GaugeSummary } from "@/types";
+import { loadSettings, type Units, type Timezone } from "@/lib/settings";
 
 const DetailChart = dynamic(() => import("@/components/DetailChart"), {
   ssr: false,
@@ -58,20 +59,37 @@ function StatCard({
 /* ── Page ──────────────────────────────────────────────────────────────── */
 export default function GaugeDetailPage({ params }: { params: { id: string } }) {
   const { id } = params;
-  const [range, setRange] = useState<TimeRange>("24h");
+  const [range,       setRange]       = useState<TimeRange>("24h");
+  const [units,       setUnits]       = useState<Units>("imperial");
+  const [timezone,    setTimezone]    = useState<Timezone>("America/New_York");
+  const [autoRefresh, setAutoRefresh] = useState(true);
+
+  useEffect(() => {
+    const s = loadSettings();
+    setRange(s.defaultRange);
+    setUnits(s.units);
+    setTimezone(s.timezone);
+    setAutoRefresh(s.autoRefresh);
+  }, []);
+
+  const isMetric   = units === "metric";
+  const unitLabel  = isMetric ? "cm" : "in";
   const rangeOption = RANGE_OPTIONS.find((o) => o.value === range) ?? RANGE_OPTIONS[0];
 
   const { data: gauge, error: gaugeErr } = useSWR<GaugeSummary>(`/api/gauges/${id}`, fetcher);
   const { data: readings, isLoading: readingsLoading } = useSWR<Reading[]>(
     `/api/gauges/${id}/readings?range=${range}&limit=1000`,
     fetcher,
-    { refreshInterval: 30_000, revalidateOnFocus: false }
+    { refreshInterval: autoRefresh ? 30_000 : 0, revalidateOnFocus: false }
   );
 
   const values  = readings?.map((r) => r.water_level_in) ?? [];
   const current = values.at(-1) ?? null;
   const high    = values.length ? Math.max(...values) : null;
   const low     = values.length ? Math.min(...values) : null;
+
+  const fmt = (v: number | null) =>
+    v != null ? (isMetric ? (v * 2.54).toFixed(2) : v.toFixed(2)) : null;
 
   if (gaugeErr) {
     return (
@@ -137,8 +155,8 @@ export default function GaugeDetailPage({ params }: { params: { id: string } }) 
       <div className="grid grid-cols-3 gap-3">
         <StatCard
           label="Current"
-          value={current != null ? current.toFixed(2) : null}
-          unit="in"
+          value={fmt(current)}
+          unit={unitLabel}
           delay={60}
           icon={
             <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -148,8 +166,8 @@ export default function GaugeDetailPage({ params }: { params: { id: string } }) 
         />
         <StatCard
           label={`${rangeOption.dropdownLabel} high`}
-          value={high != null ? high.toFixed(2) : null}
-          unit="in"
+          value={fmt(high)}
+          unit={unitLabel}
           delay={110}
           icon={
             <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -159,8 +177,8 @@ export default function GaugeDetailPage({ params }: { params: { id: string } }) 
         />
         <StatCard
           label={`${rangeOption.dropdownLabel} low`}
-          value={low != null ? low.toFixed(2) : null}
-          unit="in"
+          value={fmt(low)}
+          unit={unitLabel}
           delay={160}
           icon={
             <svg className="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -202,7 +220,7 @@ export default function GaugeDetailPage({ params }: { params: { id: string } }) 
             <p className="text-[12px] text-gray-400">No readings in {rangeOption.dropdownLabel.toLowerCase()}</p>
           </div>
         ) : (
-          <DetailChart data={readings} range={range} height={420} />
+          <DetailChart data={readings} range={range} units={units} timezone={timezone} height={420} />
         )}
       </div>
     </div>

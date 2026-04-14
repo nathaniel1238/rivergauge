@@ -6,6 +6,7 @@ import BatteryChip from "./BatteryChip";
 import StatusPill from "./StatusPill";
 import { timeAgo } from "@/lib/api";
 import type { GaugeSummary, RangeOption } from "@/types";
+import type { Units } from "@/lib/settings";
 
 const SparklineChart = dynamic(() => import("./SparklineChart"), {
   ssr: false,
@@ -17,10 +18,16 @@ const SparklineChart = dynamic(() => import("./SparklineChart"), {
 interface Props {
   gauge: GaugeSummary;
   rangeOption: RangeOption;
+  units?: Units;
   index?: number;
 }
 
-export default function GaugeCard({ gauge, rangeOption, index = 0 }: Props) {
+export default function GaugeCard({ gauge, rangeOption, units = "imperial", index = 0 }: Props) {
+  const isMetric     = units === "metric";
+  const yLabel       = isMetric ? "Water Level (cm)" : "Water Level (in)";
+  const sparkline    = isMetric
+    ? gauge.sparkline.map((p) => ({ ...p, y: p.y * 2.54 }))
+    : gauge.sparkline;
   return (
     <Link
       href={`/dashboard/gauges/${gauge.id}`}
@@ -63,14 +70,14 @@ export default function GaugeCard({ gauge, rangeOption, index = 0 }: Props) {
               className="text-[9px] text-gray-300 whitespace-nowrap select-none"
               style={{ writingMode: "vertical-lr", transform: "rotate(180deg)" }}
             >
-              Water Level (in)
+              {yLabel}
             </span>
           </div>
 
           {/* Chart */}
           <div className="flex-1 min-w-0">
-            {gauge.sparkline.length > 0 ? (
-              <SparklineChart data={gauge.sparkline} height={112} />
+            {sparkline.length > 0 ? (
+              <SparklineChart data={sparkline} height={112} />
             ) : (
               <div className="h-[112px] flex items-center justify-center rounded-lg bg-gray-50 text-[11px] text-gray-300">
                 No data

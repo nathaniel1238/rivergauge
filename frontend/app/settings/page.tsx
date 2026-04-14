@@ -1,5 +1,13 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import {
+  loadSettings,
+  saveSettings,
+  SETTINGS_DEFAULTS,
+  type AppSettings,
+} from "@/lib/settings";
+
 /* ── Section wrapper ────────────────────────────────────────────────────── */
 function Section({
   title,
@@ -91,14 +99,31 @@ function Select({ value, options, onChange }: {
 }
 
 /* ── Page ────────────────────────────────────────────────────────────────── */
-import { useState } from "react";
-
 export default function SettingsPage() {
-  const [autoRefresh,  setAutoRefresh]  = useState(true);
-  const [notifications, setNotifications] = useState(false);
-  const [timezone,     setTimezone]     = useState("America/New_York");
-  const [units,        setUnits]        = useState("imperial");
-  const [defaultRange, setDefaultRange] = useState("24h");
+  const [settings, setSettings] = useState<AppSettings>(SETTINGS_DEFAULTS);
+  const [hydrated,   setHydrated]   = useState(false);
+  const [backendOk,  setBackendOk]  = useState<boolean | null>(null);
+
+  // Hydrate from localStorage
+  useEffect(() => {
+    setSettings(loadSettings());
+    setHydrated(true);
+  }, []);
+
+  // Persist on every change (after hydration to avoid overwriting with defaults)
+  useEffect(() => {
+    if (hydrated) saveSettings(settings);
+  }, [settings, hydrated]);
+
+  // Check backend health
+  useEffect(() => {
+    fetch("/health")
+      .then((r) => setBackendOk(r.ok))
+      .catch(() => setBackendOk(false));
+  }, []);
+
+  const update = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) =>
+    setSettings((prev) => ({ ...prev, [key]: value }));
 
   return (
     <div className="max-w-2xl page-enter space-y-5">
@@ -108,7 +133,7 @@ export default function SettingsPage() {
           Settings
         </h1>
         <p className="text-[12.5px] text-gray-400 mt-0.5">
-          Dashboard preferences and display configuration
+          Dashboard preferences — saved locally in your browser
         </p>
       </div>
 
@@ -119,13 +144,13 @@ export default function SettingsPage() {
           description="Used when opening the dashboard or a gauge page"
         >
           <Select
-            value={defaultRange}
-            onChange={setDefaultRange}
+            value={settings.defaultRange}
+            onChange={(v) => update("defaultRange", v as AppSettings["defaultRange"])}
             options={[
-              { value: "24h",  label: "Last 24 hours" },
-              { value: "7d",   label: "Last 7 days"   },
-              { value: "30d",  label: "Last 30 days"  },
-              { value: "90d",  label: "Last 90 days"  },
+              { value: "24h", label: "Last 24 hours" },
+              { value: "7d",  label: "Last 7 days"   },
+              { value: "30d", label: "Last 30 days"  },
+              { value: "3m",  label: "Last 3 months" },
             ]}
           />
         </SettingRow>
@@ -135,8 +160,8 @@ export default function SettingsPage() {
           description="Measurement units for water level display"
         >
           <Select
-            value={units}
-            onChange={setUnits}
+            value={settings.units}
+            onChange={(v) => update("units", v as AppSettings["units"])}
             options={[
               { value: "imperial", label: "Imperial (in)" },
               { value: "metric",   label: "Metric (cm)"   },
@@ -146,11 +171,11 @@ export default function SettingsPage() {
 
         <SettingRow
           label="Time zone"
-          description="Used for all chart axis labels and tooltips"
+          description="Used for chart axis labels and tooltips"
         >
           <Select
-            value={timezone}
-            onChange={setTimezone}
+            value={settings.timezone}
+            onChange={(v) => update("timezone", v as AppSettings["timezone"])}
             options={[
               { value: "America/New_York",    label: "Eastern (ET)"  },
               { value: "America/Chicago",     label: "Central (CT)"  },
@@ -168,14 +193,10 @@ export default function SettingsPage() {
           label="Auto-refresh"
           description="Automatically reload gauge data every 30 seconds"
         >
-          <Toggle checked={autoRefresh} onChange={setAutoRefresh} />
-        </SettingRow>
-
-        <SettingRow
-          label="Browser notifications"
-          description="Show OS notifications when a threshold alert fires"
-        >
-          <Toggle checked={notifications} onChange={setNotifications} />
+          <Toggle
+            checked={settings.autoRefresh}
+            onChange={(v) => update("autoRefresh", v)}
+          />
         </SettingRow>
       </Section>
 
@@ -186,19 +207,22 @@ export default function SettingsPage() {
         </SettingRow>
 
         <SettingRow label="Backend" description="FastAPI data ingestion server">
-          <span className="inline-flex items-center gap-1.5 text-[12px] text-green-600">
-            <span className="relative flex h-[7px] w-[7px]">
-              <span className="animate-ping-slow absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60" />
-              <span className="relative inline-flex rounded-full h-[7px] w-[7px] bg-green-500" />
+          {backendOk === null ? (
+            <span className="text-[12px] text-gray-400">Checking…</span>
+          ) : backendOk ? (
+            <span className="inline-flex items-center gap-1.5 text-[12px] text-green-600">
+              <span className="relative flex h-[7px] w-[7px]">
+                <span className="animate-ping-slow absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60" />
+                <span className="relative inline-flex rounded-full h-[7px] w-[7px] bg-green-500" />
+              </span>
+              Connected
             </span>
-            Connected
-          </span>
-        </SettingRow>
-
-        <SettingRow label="Payload format" description="LoRaWAN device struct">
-          <span className="text-[12px] text-gray-400 font-mono bg-gray-50 px-2 py-0.5 rounded-md border border-gray-100">
-            &lt;BHIffHB
-          </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-[12px] text-red-500">
+              <span className="h-[7px] w-[7px] rounded-full bg-red-400 inline-block" />
+              Unreachable
+            </span>
+          )}
         </SettingRow>
       </Section>
     </div>

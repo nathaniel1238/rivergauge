@@ -89,7 +89,6 @@ async def ingest_chirpstack(body: dict, db: AsyncSession = Depends(get_db)):
     # Fire alerts in background — never blocks the ingest response
     asyncio.create_task(
         check_and_fire_alerts(
-            db=db,
             gauge_id=gauge.id,
             reading_id=reading.id,
             water_level_in=decoded["water_level_in"],

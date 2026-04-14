@@ -6,6 +6,7 @@ import GaugeCard from "@/components/GaugeCard";
 import TimeRangeDropdown from "@/components/TimeRangeDropdown";
 import { RANGE_OPTIONS, type TimeRange } from "@/types";
 import type { GaugeSummary } from "@/types";
+import { loadSettings, type Units } from "@/lib/settings";
 
 const PAGE_SIZE = 6;
 
@@ -111,14 +112,23 @@ function Pagination({
 
 /* ── Dashboard ─────────────────────────────────────────────────────────── */
 export default function DashboardPage() {
-  const [range, setRange]   = useState<TimeRange>("24h");
-  const [search, setSearch] = useState("");
-  const [page, setPage]     = useState(0);
+  const [range,       setRange]       = useState<TimeRange>("24h");
+  const [search,      setSearch]      = useState("");
+  const [page,        setPage]        = useState(0);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [units,       setUnits]       = useState<Units>("imperial");
+
+  useEffect(() => {
+    const s = loadSettings();
+    setRange(s.defaultRange);
+    setAutoRefresh(s.autoRefresh);
+    setUnits(s.units);
+  }, []);
 
   const { data, error, isLoading } = useSWR<GaugeSummary[]>(
     `/api/dashboard?range=${range}`,
     fetcher,
-    { refreshInterval: 30_000, revalidateOnFocus: false }
+    { refreshInterval: autoRefresh ? 30_000 : 0, revalidateOnFocus: false }
   );
 
   const rangeOption = RANGE_OPTIONS.find((o) => o.value === range) ?? RANGE_OPTIONS[0];
@@ -237,6 +247,7 @@ export default function DashboardPage() {
               key={gauge.id}
               gauge={gauge}
               rangeOption={rangeOption}
+              units={units}
               index={i}
             />
           ))}
