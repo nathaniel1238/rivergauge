@@ -24,7 +24,7 @@ function ConditionToggle({
           key={opt}
           type="button"
           onClick={() => onChange(opt)}
-          className={`flex-1 py-2 px-3 transition-colors capitalize ${
+          className={`flex-1 py-2 sm:py-1.5 px-3 min-h-[44px] sm:min-h-0 transition-colors capitalize ${
             value === opt
               ? opt === "above"
                 ? "bg-red-50 text-red-600"
@@ -53,7 +53,7 @@ function ChannelToggle({
           key={opt}
           type="button"
           onClick={() => onChange(opt)}
-          className={`flex-1 py-2 px-3 transition-colors ${
+          className={`flex-1 py-2 sm:py-1.5 px-3 min-h-[44px] sm:min-h-0 transition-colors ${
             value === opt
               ? "bg-[#3b6cf5] text-white"
               : "bg-white text-gray-400 hover:text-gray-600"
@@ -119,7 +119,7 @@ export default function AlertForm({ onSuccess }: Props) {
   };
 
   const inputCls =
-    "w-full bg-white border border-gray-200 rounded-xl text-[13px] px-3 py-2.5 focus:outline-none focus:border-[#3b6cf5] focus:ring-2 focus:ring-[#3b6cf5]/10 transition-all";
+    "w-full bg-white border border-gray-200 rounded-xl text-[13px] px-3 py-2.5 min-h-[44px] focus:outline-none focus:border-[#3b6cf5] focus:ring-2 focus:ring-[#3b6cf5]/10 transition-all";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -194,6 +194,7 @@ export default function AlertForm({ onSuccess }: Props) {
             required
             type="email"
             placeholder="you@example.com"
+            autoComplete="email"
             value={contact}
             onChange={(e) => setContact(e.target.value)}
             className={inputCls}
@@ -203,6 +204,8 @@ export default function AlertForm({ onSuccess }: Props) {
             required
             type="tel"
             placeholder="+12125551234"
+            inputMode="tel"
+            autoComplete="tel"
             value={contact}
             onChange={(e) => setContact(e.target.value)}
             className={inputCls}
@@ -224,7 +227,7 @@ export default function AlertForm({ onSuccess }: Props) {
       <button
         type="submit"
         disabled={formState === "submitting"}
-        className="w-full bg-[#3b6cf5] hover:bg-[#2b5ce0] disabled:opacity-60 text-white text-[12.5px] font-medium py-2.5 rounded-xl transition-colors shadow-sm"
+        className="w-full bg-[#3b6cf5] hover:bg-[#2b5ce0] disabled:opacity-60 text-white text-[12.5px] font-medium py-3 rounded-xl transition-colors shadow-sm min-h-[44px]"
       >
         {formState === "submitting" ? "Subscribing…" : "Create alert"}
       </button>

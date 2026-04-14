@@ -155,12 +155,12 @@ export default function AlertsPage() {
                 className={`relative flex-shrink-0 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-gray-400 ${
                   rule.active ? "bg-[#3b6cf5]" : "bg-gray-200"
                 }`}
-                style={{ height: "18px", width: "32px" }}
+                style={{ height: "22px", width: "40px" }}
                 aria-label={rule.active ? "Disable rule" : "Enable rule"}
               >
                 <span
-                  className={`absolute top-0.5 left-0.5 w-3.5 h-3.5 bg-white rounded-full shadow-sm transition-transform ${
-                    rule.active ? "translate-x-3.5" : "translate-x-0"
+                  className={`absolute top-[3px] left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${
+                    rule.active ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
               </button>
@@ -182,9 +182,9 @@ export default function AlertsPage() {
                 </div>
               </div>
 
-              {/* Status dot */}
+              {/* Status dot — hidden on mobile */}
               {rule.active && (
-                <span className="relative flex h-2 w-2 flex-shrink-0">
+                <span className="hidden sm:flex relative h-2 w-2 flex-shrink-0">
                   <span className="animate-ping-slow absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-60" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
                 </span>
@@ -193,7 +193,7 @@ export default function AlertsPage() {
               {/* Delete */}
               <button
                 onClick={() => handleDelete(rule.token)}
-                className="p-1.5 -mr-1 text-gray-300 hover:text-red-400 hover:bg-red-50 rounded-lg transition-all"
+                className="p-2 -mr-1 text-gray-300 hover:text-red-400 hover:bg-red-50 rounded-lg transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Delete rule"
               >
                 <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

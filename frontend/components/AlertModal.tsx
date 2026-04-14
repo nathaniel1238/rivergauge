@@ -24,15 +24,18 @@ export default function AlertModal({ open, onClose, onSuccess }: Props) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-40 flex items-end sm:items-center justify-center sm:p-4">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"
         onClick={onClose}
       />
 
-      {/* Card */}
-      <div className="relative z-50 w-full max-w-md bg-white rounded-2xl shadow-2xl p-6 animate-fade-in">
+      {/* Sheet (mobile) / Card (desktop) */}
+      <div className="relative z-50 w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl p-6 animate-slide-up sm:animate-fade-in">
+        {/* Drag handle — mobile only */}
+        <div className="sm:hidden w-10 h-1 bg-gray-200 rounded-full mx-auto mb-5" />
+
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <div>
@@ -43,7 +46,7 @@ export default function AlertModal({ open, onClose, onSuccess }: Props) {
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 text-gray-300 hover:text-gray-500 hover:bg-gray-100 rounded-lg transition-all"
+            className="p-2 text-gray-300 hover:text-gray-500 hover:bg-gray-100 rounded-lg transition-all min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Close"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
