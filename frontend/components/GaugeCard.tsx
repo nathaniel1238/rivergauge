@@ -65,7 +65,7 @@ export default function GaugeCard({ gauge, rangeOption, units = "imperial", inde
         {/* ── Chart area ──────────────────────────────────────────── */}
         <div className="flex items-stretch gap-1 flex-1 min-h-0">
           {/* Y-label */}
-          <div className="flex items-center justify-center w-4 flex-shrink-0">
+          <div className="hidden sm:flex items-center justify-center w-4 flex-shrink-0">
             <span
               className="text-[9px] text-gray-300 whitespace-nowrap select-none"
               style={{ writingMode: "vertical-lr", transform: "rotate(180deg)" }}

@@ -19,7 +19,7 @@ interface Props {
   range: TimeRange;
   units?: Units;
   timezone?: Timezone;
-  height?: number;
+  height?: number | string;
 }
 
 function fmtAxisLabel(ts: number, range: TimeRange, timezone: Timezone): string {
@@ -63,7 +63,7 @@ export default function DetailChart({
   const buildOption = useCallback(
     (seriesData: [number, number][], pin: PinnedPoint | null) => ({
       animation: false,
-      grid: { top: 20, right: 24, bottom: 48, left: 56 },
+      grid: { top: 20, right: 16, bottom: 48, left: 8, containLabel: true },
       xAxis: {
         type: "time",
         boundaryGap: false,

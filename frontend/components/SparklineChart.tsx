@@ -22,7 +22,7 @@ export default function SparklineChart({ data, height = 110 }: Props) {
 
     return {
       animation: false,
-      grid: { top: 4, right: 10, bottom: 4, left: 42, containLabel: false },
+      grid: { top: 4, right: 10, bottom: 4, left: 8, containLabel: true },
       xAxis: { type: "time", show: false, boundaryGap: false },
       yAxis: {
         type: "value",
