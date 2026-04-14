@@ -7,8 +7,11 @@ RUN npm install
 
 COPY . .
 
+ARG NEXT_PUBLIC_FEATURE_ALERTS=false
+ENV NEXT_PUBLIC_FEATURE_ALERTS=$NEXT_PUBLIC_FEATURE_ALERTS
+
+RUN npm run build
+
 EXPOSE 3000
 
-ENV BACKEND_URL=http://backend:8000
-
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]
