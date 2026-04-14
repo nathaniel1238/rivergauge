@@ -47,14 +47,14 @@ function SettingRow({
   children: React.ReactNode;
 }) {
   return (
-    <div className="px-6 py-4 flex items-center justify-between gap-6">
+    <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6">
       <div className="min-w-0">
         <p className="text-[13px] font-medium text-gray-800">{label}</p>
         {description && (
           <p className="text-[11.5px] text-gray-400 mt-0.5 leading-relaxed">{description}</p>
         )}
       </div>
-      <div className="flex-shrink-0">{children}</div>
+      <div className="flex-shrink-0 sm:self-auto">{children}</div>
     </div>
   );
 }
@@ -64,15 +64,15 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
   return (
     <button
       onClick={() => onChange(!checked)}
-      style={{ height: "20px", width: "36px" }}
+      style={{ height: "24px", width: "44px" }}
       className={`relative rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#3b6cf5] ${
         checked ? "bg-[#3b6cf5]" : "bg-gray-200"
       }`}
       aria-pressed={checked}
     >
       <span
-        className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${
-          checked ? "translate-x-4" : "translate-x-0"
+        className={`absolute top-1 left-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-transform ${
+          checked ? "translate-x-6" : "translate-x-0"
         }`}
       />
     </button>
@@ -89,7 +89,7 @@ function Select({ value, options, onChange }: {
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="text-[12.5px] text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#3b6cf5] focus:ring-2 focus:ring-[#3b6cf5]/10 transition-all shadow-sm cursor-pointer"
+      className="text-[12.5px] text-gray-700 bg-white border border-gray-200 rounded-lg px-3 py-1.5 w-full sm:w-auto focus:outline-none focus:border-[#3b6cf5] focus:ring-2 focus:ring-[#3b6cf5]/10 transition-all shadow-sm cursor-pointer"
     >
       {options.map((o) => (
         <option key={o.value} value={o.value}>{o.label}</option>

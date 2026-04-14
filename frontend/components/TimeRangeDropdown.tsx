@@ -14,11 +14,15 @@ export default function TimeRangeDropdown({ value, onChange }: Props) {
   const selected = RANGE_OPTIONS.find((o) => o.value === value) ?? RANGE_OPTIONS[0];
 
   useEffect(() => {
-    function handler(e: MouseEvent) {
+    function handler(e: MouseEvent | TouchEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
+    document.addEventListener("mousedown", handler as EventListener);
+    document.addEventListener("touchstart", handler as EventListener);
+    return () => {
+      document.removeEventListener("mousedown", handler as EventListener);
+      document.removeEventListener("touchstart", handler as EventListener);
+    };
   }, []);
 
   return (
@@ -57,7 +61,7 @@ export default function TimeRangeDropdown({ value, onChange }: Props) {
             <button
               key={opt.value}
               onClick={() => { onChange(opt.value); setOpen(false); }}
-              className={`w-full flex items-center justify-between px-3.5 py-2 text-[13px] transition-colors ${
+              className={`w-full flex items-center justify-between px-3.5 py-2.5 sm:py-2 text-[13px] transition-colors ${
                 active
                   ? "bg-blue-50 text-[#3b6cf5] font-medium"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
