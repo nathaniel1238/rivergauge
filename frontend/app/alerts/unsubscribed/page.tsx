@@ -17,7 +17,7 @@ export default function UnsubscribedPage() {
         </div>
         <h1 className="text-[18px] font-semibold text-gray-900 mb-2">Unsubscribed</h1>
         <p className="text-[13px] text-gray-500 leading-relaxed mb-6">
-          You've been removed from this alert. You won't receive any more
+          You&apos;ve been removed from this alert. You won&apos;t receive any more
           notifications for this subscription.
         </p>
         <Link

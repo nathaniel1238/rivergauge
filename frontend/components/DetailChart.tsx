@@ -55,7 +55,6 @@ export default function DetailChart({
   const isMetric  = units === "metric";
   const unitLabel = isMetric ? "cm" : "in";
   const containerRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chartRef       = useRef<any>(null);
   const seriesDataRef  = useRef<[number, number][]>([]);
   const [pinned, setPinned] = useState<PinnedPoint | null>(null);

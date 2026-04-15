@@ -10,7 +10,6 @@ interface Props {
 
 export default function SparklineChart({ data, height = 110 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const chartRef = useRef<any>(null);
 
   const buildOption = (pts: SparklinePoint[]) => {
