@@ -29,7 +29,7 @@ export default function MapPage() {
         <div className="hidden sm:flex items-center gap-4 text-[11px] text-gray-400">
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#3b6cf5] inline-block" />
-            Online
+            Healthy battery
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#f59e0b] inline-block" />
@@ -37,7 +37,7 @@ export default function MapPage() {
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#ef4444] inline-block" />
-            Replace / offline
+            Replace battery
           </span>
         </div>
       </div>
