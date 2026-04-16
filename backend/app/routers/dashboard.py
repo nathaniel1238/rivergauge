@@ -77,6 +77,8 @@ async def get_dashboard(
                 "minutes_ago": _minutes_ago(g.last_updated_at),
                 "battery_state": g.battery_state or "unknown",
                 "online_state": _online_state(g.last_updated_at),
+                "latitude": g.latitude,
+                "longitude": g.longitude,
                 "sparkline": sparkline,
             }
         )

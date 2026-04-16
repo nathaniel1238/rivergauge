@@ -3,15 +3,19 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from sqlalchemy import text
+
 from app.database import Base, engine
 from app.routers import alerts, dashboard, gauges, ingest
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Create tables on startup (idempotent)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # Idempotent column migrations (ADD COLUMN IF NOT EXISTS is safe to re-run)
+        await conn.execute(text("ALTER TABLE gauges ADD COLUMN IF NOT EXISTS latitude FLOAT"))
+        await conn.execute(text("ALTER TABLE gauges ADD COLUMN IF NOT EXISTS longitude FLOAT"))
     yield
 
 

@@ -16,6 +16,8 @@ export interface GaugeSummary {
   minutes_ago: number | null;
   battery_state: BatteryState;
   online_state: OnlineState;
+  latitude: number | null;
+  longitude: number | null;
   sparkline: SparklinePoint[];
 }
 

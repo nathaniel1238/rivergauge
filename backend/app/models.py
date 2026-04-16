@@ -16,6 +16,8 @@ class Gauge(Base):
     town_state = Column(String(255))
     last_updated_at = Column(DateTime(timezone=True))
     battery_state = Column(String(20))  # healthy | mid | replace
+    latitude  = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
 
