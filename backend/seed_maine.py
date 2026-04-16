@@ -44,7 +44,7 @@ from app.models import Gauge, Reading
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 INTERVAL_MIN     = 30
-NUM_DAYS         = 90
+NUM_DAYS         = 92   # Jan 15 → Apr 17
 READINGS_PER_DAY = 24 * 60 // INTERVAL_MIN   # 48
 NUM_POINTS       = NUM_DAYS * READINGS_PER_DAY  # 4 320
 CHUNK_SIZE       = 500
