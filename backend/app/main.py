@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 
 from sqlalchemy import text
 
@@ -27,6 +28,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def no_cache(request: Request, call_next) -> Response:
+    """Prevent Vercel/CDN from caching API responses."""
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    return response
 
 app.include_router(alerts.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")

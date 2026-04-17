@@ -80,7 +80,7 @@ export default function GaugeDetailPage({ params }: { params: { id: string } }) 
   const { data: readings, isLoading: readingsLoading } = useSWR<Reading[]>(
     `/api/gauges/${id}/readings?range=${range}&limit=1000`,
     fetcher,
-    { refreshInterval: autoRefresh ? 30_000 : 0, revalidateOnFocus: false }
+    { refreshInterval: autoRefresh ? 5_000 : 0, revalidateOnFocus: false }
   );
 
   const values  = readings?.map((r) => r.water_level_in) ?? [];

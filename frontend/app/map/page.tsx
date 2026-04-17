@@ -12,7 +12,7 @@ export default function MapPage() {
   const { data: gauges, isLoading } = useSWR<GaugeSummary[]>(
     "/api/dashboard?range=24h",
     fetcher,
-    { refreshInterval: 60_000 }
+    { refreshInterval: 15_000 }
   );
 
   const pinCount = gauges?.filter((g) => g.latitude != null).length ?? 0;
