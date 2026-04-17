@@ -41,7 +41,7 @@ DEFAULT_URL = "https://rivergauge-production.up.railway.app"
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 
-_seq = 1  # global sequence counter, auto-increments each call
+_seq = int(time.time()) & 0xFFFFFFFF  # start from current Unix time — unique across restarts
 
 
 def build_payload(water_level_in: float, seq: int) -> str:
