@@ -28,6 +28,10 @@ export default function MapPage() {
         </div>
         <div className="hidden sm:flex items-center gap-4 text-[11px] text-gray-400">
           <span className="flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#16a34a] inline-block" />
+            Live demo
+          </span>
+          <span className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-[#3b6cf5] inline-block" />
             Healthy battery
           </span>

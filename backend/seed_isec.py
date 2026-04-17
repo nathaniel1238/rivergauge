@@ -39,9 +39,10 @@ ISEC_GAUGE = {
     "device_id":    13,                 # ← UPDATE to match actual sensor firmware device_id
     "name":         "ISEC Demo Sensor",
     "town_state":   "Boston, MA",
-    "latitude":     42.3368,
-    "longitude":    -71.0994,
+    "latitude":     42.3377,
+    "longitude":    -71.0869,
     "battery_state": "healthy",
+    "featured":     True,
 }
 
 
@@ -92,7 +93,8 @@ async def run():
                         latitude = :lat,
                         longitude = :lng,
                         battery_state = :batt,
-                        last_updated_at = :ts
+                        last_updated_at = :ts,
+                        featured = :featured
                     WHERE id = :id
                 """),
                 {
@@ -102,6 +104,7 @@ async def run():
                     "lng":        ISEC_GAUGE["longitude"],
                     "batt":       ISEC_GAUGE["battery_state"],
                     "ts":         now,
+                    "featured":   ISEC_GAUGE["featured"],
                     "id":         gauge_id,
                 },
             )
@@ -112,10 +115,10 @@ async def run():
                 text("""
                     INSERT INTO gauges
                         (device_id, name, town_state, latitude, longitude,
-                         battery_state, last_updated_at, created_at)
+                         battery_state, featured, last_updated_at, created_at)
                     VALUES
                         (:did, :name, :town_state, :lat, :lng,
-                         :batt, :ts, :ts)
+                         :batt, :featured, :ts, :ts)
                 """),
                 {
                     "did":        ISEC_GAUGE["device_id"],
@@ -124,6 +127,7 @@ async def run():
                     "lat":        ISEC_GAUGE["latitude"],
                     "lng":        ISEC_GAUGE["longitude"],
                     "batt":       ISEC_GAUGE["battery_state"],
+                    "featured":   ISEC_GAUGE["featured"],
                     "ts":         now,
                 },
             )

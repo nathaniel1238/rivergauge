@@ -18,6 +18,7 @@ export interface GaugeSummary {
   online_state: OnlineState;
   latitude: number | null;
   longitude: number | null;
+  featured: boolean;
   sparkline: SparklinePoint[];
 }
 

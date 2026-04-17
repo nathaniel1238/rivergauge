@@ -40,9 +40,20 @@ export default function GaugeCard({ gauge, rangeOption, units = "imperial", inde
           transition-all duration-200 ease-out cursor-pointer
           shadow-card group-hover:shadow-card-hover group-hover:border-gray-200
           group-hover:-translate-y-[2px]
-          ${gauge.battery_state === "replace" ? "border-red-100" : "border-gray-100"}
+          ${gauge.featured ? "border-emerald-300 ring-1 ring-emerald-200" : gauge.battery_state === "replace" ? "border-red-100" : "border-gray-100"}
         `}
       >
+        {/* ── Featured banner ──────────────────────────────────────── */}
+        {gauge.featured && (
+          <div className="-mx-5 -mt-5 mb-0 px-4 py-1.5 bg-emerald-500 rounded-t-2xl flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+            </span>
+            <span className="text-[11px] font-semibold text-white tracking-wide uppercase">Live Demo</span>
+          </div>
+        )}
+
         {/* ── Header ──────────────────────────────────────────────── */}
         <div className="flex items-start justify-between gap-3">
           <h2 className="text-[13.5px] font-semibold text-gray-900 leading-snug">

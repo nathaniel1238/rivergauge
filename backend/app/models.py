@@ -18,6 +18,7 @@ class Gauge(Base):
     battery_state = Column(String(20))  # healthy | mid | replace
     latitude  = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    featured  = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
 

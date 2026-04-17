@@ -45,7 +45,7 @@ async def get_dashboard(
     hours = RANGE_HOURS.get(range, 24)
     since = datetime.now(timezone.utc) - timedelta(hours=hours)
 
-    gauges_result = await db.execute(select(Gauge).order_by(Gauge.device_id))
+    gauges_result = await db.execute(select(Gauge).order_by(Gauge.featured.desc(), Gauge.device_id))
     gauges = gauges_result.scalars().all()
 
     output = []
@@ -79,6 +79,7 @@ async def get_dashboard(
                 "online_state": _online_state(g.last_updated_at),
                 "latitude": g.latitude,
                 "longitude": g.longitude,
+                "featured": bool(g.featured),
                 "sparkline": sparkline,
             }
         )

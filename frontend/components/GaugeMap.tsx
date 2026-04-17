@@ -10,12 +10,42 @@ interface Props {
 }
 
 function markerColor(gauge: GaugeSummary): string {
+  if (gauge.featured) return "#16a34a";
   if (gauge.battery_state === "replace") return "#ef4444";
   if (gauge.battery_state === "mid") return "#f59e0b";
   return "#3b6cf5";
 }
 
-function makeIcon(color: string) {
+function makeIcon(color: string, featured = false) {
+  if (featured) {
+    return L.divIcon({
+      className: "",
+      html: `
+        <div style="position:relative;width:44px;height:52px">
+          <div style="
+            position:absolute;top:0;left:0;width:44px;height:44px;border-radius:50%;
+            background:${color};opacity:0.2;
+            animation:pulse-ring 1.6s ease-out infinite;
+          "></div>
+          <svg width="36" height="46" viewBox="0 0 26 34" xmlns="http://www.w3.org/2000/svg"
+               style="position:absolute;top:4px;left:4px">
+            <path d="M13 0C5.82 0 0 5.82 0 13c0 10.5 13 21 13 21S26 23.5 26 13C26 5.82 20.18 0 13 0z"
+                  fill="${color}" opacity="0.95"/>
+            <circle cx="13" cy="13" r="5.5" fill="white"/>
+          </svg>
+        </div>
+        <style>
+          @keyframes pulse-ring {
+            0%   { transform: scale(0.6); opacity: 0.4; }
+            70%  { transform: scale(1.4); opacity: 0;   }
+            100% { transform: scale(1.4); opacity: 0;   }
+          }
+        </style>`,
+      iconSize: [44, 52],
+      iconAnchor: [22, 50],
+      popupAnchor: [0, -52],
+    });
+  }
   return L.divIcon({
     className: "",
     html: `<svg width="26" height="34" viewBox="0 0 26 34" xmlns="http://www.w3.org/2000/svg">
@@ -63,7 +93,7 @@ export default function GaugeMap({ gauges }: Props) {
         const battColor   = gauge.battery_state === "healthy" ? "#1d4ed8" : gauge.battery_state === "mid" ? "#b45309" : "#b91c1c";
         const cap         = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-        L.marker([gauge.latitude!, gauge.longitude!], { icon: makeIcon(markerColor(gauge)) })
+        L.marker([gauge.latitude!, gauge.longitude!], { icon: makeIcon(markerColor(gauge), gauge.featured) })
           .addTo(map)
           .bindPopup(`
             <div style="min-width:170px;font-family:inherit">

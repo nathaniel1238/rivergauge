@@ -17,6 +17,7 @@ async def lifespan(app: FastAPI):
         # Idempotent column migrations (ADD COLUMN IF NOT EXISTS is safe to re-run)
         await conn.execute(text("ALTER TABLE gauges ADD COLUMN IF NOT EXISTS latitude FLOAT"))
         await conn.execute(text("ALTER TABLE gauges ADD COLUMN IF NOT EXISTS longitude FLOAT"))
+        await conn.execute(text("ALTER TABLE gauges ADD COLUMN IF NOT EXISTS featured BOOLEAN NOT NULL DEFAULT FALSE"))
     yield
 
 
