@@ -44,13 +44,13 @@ from app.models import Gauge, Reading
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 INTERVAL_MIN     = 30
-NUM_DAYS         = 92   # Jan 15 → Apr 17
 READINGS_PER_DAY = 24 * 60 // INTERVAL_MIN   # 48
-NUM_POINTS       = NUM_DAYS * READINGS_PER_DAY  # 4 320
 CHUNK_SIZE       = 500
 
-# Jan 15, 2026 00:00 UTC  →  Apr 15, 2026 (last step ≈ Apr 14 23:30 UTC)
-START_TS = datetime(2026, 1, 15, 0, 0, 0, tzinfo=timezone.utc)
+# Start date is fixed; end is always "now" so re-running extends data to today.
+START_TS   = datetime(2026, 1, 15, 0, 0, 0, tzinfo=timezone.utc)
+NUM_POINTS = int((datetime.now(timezone.utc) - START_TS).total_seconds() / (INTERVAL_MIN * 60))
+NUM_DAYS   = NUM_POINTS // READINGS_PER_DAY  # used only by spring_curve context
 
 # ── Gauge definitions ─────────────────────────────────────────────────────────
 # daily_drain_mv: average battery drop per day (mV) — affects end-of-period state
